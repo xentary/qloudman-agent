@@ -2,6 +2,7 @@ import pika
 import socket
 import ConfigParser, os
 
+from Play import Play
 from System import System
 
 hostname = socket.gethostname()
@@ -10,15 +11,10 @@ config = ConfigParser.ConfigParser()
 config.read(["qloudman.cfg", "/etc/qloudman.cfg"])
 
 def receive_command(command):
-	if (command == u"system-update"):
-		do_system_update()
-	else:
-		print "Unkown command: %s" % command
-
-
-def do_system_update():
-	s = System()
-	s.do_update()
+	s = System(command)
+	if s.is_responsible():
+		s.execute()
+		return
 
 
 #receive_command(u"system-update")

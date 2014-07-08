@@ -2,13 +2,20 @@ import os.path
 import subprocess
 
 class System:
-	def __init__(self):
+	def __init__(self, command):
+		self.command = command
+		
 		self.ostype = "apt"
 		if (os.path.isfile("/etc/redhat-release")):
 			self.ostype = "rpm"
 
+	def is_responsible(self):
+		if (self.command == u"system-update"):
+			return True
+		else:
+			return False
 
-	def do_update(self):
+	def execute(self):
 		if self.ostype == u"rpm":
 			self.__yum("update", "-y")
 		elif self.ostype == u"apt":
