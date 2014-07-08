@@ -16,6 +16,11 @@ def receive_command(command):
 		s.execute()
 		return
 
+	s = Play(command)
+	if s.is_responsible():
+		s.execute()
+		return
+
 
 #receive_command(u"system-update")
 
