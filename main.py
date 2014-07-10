@@ -4,6 +4,7 @@ import ConfigParser, os
 import httplib
 
 from Play import Play
+from Qloudman import Qloudman
 from System import System
 
 hostname = socket.gethostname()
@@ -12,6 +13,11 @@ config = ConfigParser.ConfigParser()
 config.read(["qloudman.cfg", "/etc/qloudman.cfg"])
 
 def receive_command(command):
+	s = Qloudman(command)
+	if s.is_responsible():
+		s.execute()
+		return
+
 	s = System(command)
 	if s.is_responsible():
 		s.execute()
