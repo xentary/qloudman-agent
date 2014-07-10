@@ -2,6 +2,8 @@ import pika
 import socket
 import ConfigParser, os
 import httplib
+import requests
+import json
 
 from Play import Play
 from Qloudman import Qloudman
@@ -13,23 +15,28 @@ config = ConfigParser.ConfigParser()
 config.read(["qloudman.cfg", "/etc/qloudman.cfg"])
 
 def receive_command(command):
+	parts = command.split("|")
+	command = parts[0]
+	cmdid = parts[1]
+
 	s = Qloudman(command)
 	if s.is_responsible():
-		s.execute()
-		return
-
+		(retval,result) = s.execute()
+		
 	s = System(command)
 	if s.is_responsible():
-		s.execute()
-		return
-
+		(retval,result) = s.execute()
+		
 	s = Play(command)
 	if s.is_responsible():
-		s.execute()
-		return
+		(retval,result) = s.execute()
+		
+	payload = {"host": hostname, "cmdid": cmdid, "retval": retval, "result": result}
+	print payload
 
-
-#receive_command(u"system-update")
+	url = "http://%s:%i/api/cmd_result" % (config.get("main", "server"), config.getint("main", "port"))
+	r = requests.post(url, data=payload)
+	print r.status_code
 
 def callback(ch, method, properties, body):
 	print "Message received: %r" % (body,)
@@ -38,10 +45,9 @@ def callback(ch, method, properties, body):
 
 
 # Register at server
-conn = httplib.HTTPConnection(config.get("main", "server"), config.getint("main", "port"));
-conn.request("GET", "/api/register_node/%s" % hostname)
-response = conn.getresponse()
-print response.status, response.reason
+url = "http://%s:%i/api/register_node/%s" % (config.get("main", "server"), config.getint("main", "port"),  hostname)
+response = requests.get(url)
+print response.status_code, response.text
 
 
 connection = pika.BlockingConnection(pika.ConnectionParameters(config.get("broadcast", "server"), config.getint("broadcast", "port")))

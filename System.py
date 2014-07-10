@@ -21,6 +21,8 @@ class System:
 		elif self.ostype == u"apt":
 			self.__apt("update")
 			self.__apt("upgrade") 
+
+		return (self.retval, self.output)
 			
 	def __yum(self, command, options = ""):
 		cmd = "yum %s %s" % (options, command)
@@ -31,7 +33,9 @@ class System:
 		self.__exec(cmd)
 
 	def __exec(self, cmd):
+		self.output = ""
+
 		p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		for line in p.stdout.readlines():
-			print line,
-		retval = p.wait()
+			self.output += line
+		self.retval = p.wait()
