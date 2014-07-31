@@ -31,7 +31,7 @@ def receive_command(command):
 	if s.is_responsible():
 		(retval,result) = s.execute()
 		
-	payload = {"host": hostname, "cmdid": cmdid, "retval": retval, "result": result}
+	payload = {"node": hostname, "cmdid": cmdid, "retval": retval, "result": result}
 	print payload
 
 	url = "http://%s:%i/api/cmd_result" % (config.get("main", "server"), config.getint("main", "port"))

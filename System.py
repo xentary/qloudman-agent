@@ -20,7 +20,7 @@ class System:
 			self.__yum("update", "-y")
 		elif self.ostype == u"apt":
 			self.__apt("update")
-			self.__apt("upgrade") 
+			self.__apt("upgrade", "-y") 
 
 		return (self.retval, self.output)
 			
